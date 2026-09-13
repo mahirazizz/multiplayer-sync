@@ -1,10 +1,10 @@
 const KEY = "syncspace.clientId";
 
 export function getOrCreateClientId(): string {
-  let id = localStorage.getItem(KEY);
+  let id = sessionStorage.getItem(KEY);
   if (!id || !/^[a-zA-Z0-9_-]{8,64}$/.test(id)) {
     id = genClientId();
-    localStorage.setItem(KEY, id);
+    sessionStorage.setItem(KEY, id);
   }
   return id;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { SyncEngine } from "../sync/syncEngine.js";
 import type { SyncSnapshot } from "../sync/types.js";
 import { getOrCreateClientId } from "../utils/clientId.js";
@@ -27,24 +27,21 @@ export function useSyncRoom({
   name,
 }: UseSyncRoomOptions): UseSyncRoomResult {
   const clientId = useMemo(() => getOrCreateClientId(), []);
-  const engineRef = useRef<SyncEngine | null>(null);
+  const [engine, setEngine] = useState<SyncEngine | null>(null);
 
   useEffect(() => {
     if (!roomId) {
-      engineRef.current?.stop();
-      engineRef.current = null;
+      setEngine(null);
       return;
     }
     const engine = new SyncEngine({ url: WS_URL, clientId, roomId, name });
-    engineRef.current = engine;
+    setEngine(engine);
     engine.start();
     return () => {
       engine.stop();
-      engineRef.current = null;
+      setEngine((current) => (current === engine ? null : current));
     };
   }, [roomId, clientId, name]);
-
-  const engine = engineRef.current;
 
   const snapshot = useSyncExternalStore<SyncSnapshot | null>(
     (cb) => {
