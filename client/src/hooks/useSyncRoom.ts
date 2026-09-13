@@ -16,6 +16,8 @@ export interface UseSyncRoomResult {
 const WS_URL: string = (() => {
   const env = import.meta.env as Record<string, string | undefined>;
   if (env.VITE_WS_URL) return env.VITE_WS_URL;
+  const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
+  if (!isLocal) return "wss://multiplayer-sync-server-f94p.onrender.com";
   const proto = location.protocol === "https:" ? "wss" : "ws";
   return `${proto}://${location.hostname}:8080`;
 })();
